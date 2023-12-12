@@ -34,7 +34,7 @@ public:
 		Folder* folder = new Folder(folderName);
 		folder->parent = this;
 		int length = path.length();
-		folder->path = path.substr(0, length - 1) + folderName + ">";
+		folder->path = path.substr(0, length - 1) + folderName;
 		subDirectories.push_back(folder);
 	}
 
@@ -46,24 +46,26 @@ public:
 
 	void removeFolder(string foldername)
 	{
-		for (list<Folder*>::iterator i = subDirectories.begin(); i != subDirectories.end(); i++)
+		list<Folder*>::iterator i;
+		for (i = subDirectories.begin(); i != subDirectories.end(); i++)
 		{
 			if ((*i)->name == foldername)
 			{
-				delete* i;
-				i = subDirectories.erase(i);
+				subDirectories.erase(i);
+				break;
 			}
 		}
 	}
 
 	void removeFile(string filename)
 	{
-		for (list<File*>::iterator i = files.begin(); i != files.end(); i++)
+		list<File*>::iterator i;
+		for (i = files.begin(); i != files.end(); i++)
 		{
 			if ((*i)->name == filename)
 			{
-				delete* i;
-				i = files.erase(i);
+				files.erase(i);
+				break;
 			}
 		}
 	}
@@ -80,6 +82,30 @@ public:
 		return false;
 	}
 
+	Folder* searchAndReturnFolder(string folder)
+	{
+		for (list<Folder*>::iterator i = subDirectories.begin(); i != subDirectories.end(); i++)
+		{
+			if ((*i)->name == folder)
+			{
+				return *i;
+			}
+		}
+		return nullptr;
+	}
+
+	File* searchAndReturnFile(string file)
+	{
+		for (list<File*>::iterator i = files.begin(); i != files.end(); i++)
+		{
+			if ((*i)->name == file)
+			{
+				return *i;
+			}
+		}
+		return nullptr;
+	}
+
 	string retDate()
 	{
 		char date[12]; 
@@ -92,5 +118,35 @@ public:
 		char timed[9];  
 		strftime(timed, sizeof(timed), "%I:%M %p", &createTime);
 		return timed;
+	}
+
+	int calculateDepth() 
+	{
+		int depth = 0;
+
+		for (list<Folder*>::iterator i = subDirectories.begin(); i != subDirectories.end(); i++)
+		{
+			depth = max(depth, (*i)->calculateDepth());
+		}
+		return depth + 1;
+	}
+
+	void printFolderStructure(int depth)
+	{
+		for (list<Folder*>::iterator it = subDirectories.begin(); it != subDirectories.end(); it++)
+		{
+			if (depth == 0)
+			{
+				cout << string((depth) * 4, ' ') << "|____" << (*it)->name << endl;
+				(*it)->printFolderStructure(depth + 1);
+
+			}
+
+			else
+			{
+				cout << "|" << string((depth) * 4, ' ') << "|____" << (*it)->name << endl;
+				(*it)->printFolderStructure(depth + 1);
+			}
+		}
 	}
 };

@@ -1,2 +1,6 @@
 ﻿  DOS Shell.cpp
+D:\University\Data Structures and Algorithms\DOS Shell\File.h(109,23): warning C4018: '>=': signed/unsigned mismatch
+D:\University\Data Structures and Algorithms\DOS Shell\File.h(132,23): warning C4018: '>=': signed/unsigned mismatch
+D:\University\Data Structures and Algorithms\DOS Shell\File.h(142,23): warning C4018: '<': signed/unsigned mismatch
+D:\University\Data Structures and Algorithms\DOS Shell\File.h(179,27): warning C4018: '<': signed/unsigned mismatch
   DOS Shell.vcxproj -> D:\University\Data Structures and Algorithms\DOS Shell\Debug\DOS Shell.exe
