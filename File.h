@@ -52,7 +52,7 @@ public:
 			}
 		}
 
-		for (i = 0; i < size; i++)
+		for (i=i; i < size; i++)
 		{
 			ext += fileName[i];
 		}
@@ -73,15 +73,16 @@ public:
 	void edit()
 	{
 		system("cls");
-		displayText(currentState);
+		gotoxy(0, 0);
+		if ((*currentState.data.begin()).size() > 0 && currentState.data.size() > 0)
+		{
+			displayText(currentState);
+		}
 
 		gotoxy(0, 0);
-		gotoxy(currentState.col, currentState.col);
-		currentState.rowIter = currentState.data.begin();
-		currentState.colIter = (*currentState.rowIter).begin();
 		State newState;
-		newState.col = currentState.col;
-		newState.row = currentState.row;
+		newState.col = 0;
+		newState.row = 0;
 		newState.data = currentState.data;
 		newState.rowIter = newState.data.begin();
 		newState.colIter = (*newState.rowIter).begin();
@@ -242,6 +243,11 @@ public:
 			else if (GetAsyncKeyState(VK_CONTROL) && GetAsyncKeyState('S'))
 			{
 				currentState = newState;
+				break;
+			}
+
+			else if (GetAsyncKeyState(VK_ESCAPE))
+			{
 				break;
 			}
 

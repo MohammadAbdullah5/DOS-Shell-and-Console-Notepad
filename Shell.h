@@ -29,9 +29,8 @@ public:
 			print();
 
 			getline(cin, command);
-			cout << endl;
 			commandSize = command.size();
-			if (command.substr(0, 7) == "ATTRIB " || command.substr(0, 7) == "attrib ")
+			if (command.substr(0, 7) == "ATTRIB " || command.substr(0, 7) == "attrib ") // 1
 			{
 				if (commandSize > 7)
 				{
@@ -44,7 +43,7 @@ public:
 				}
 			}
 
-			else if (command.substr(0, 6) == "MKDIR " || command.substr(0, 6) == "mkdir ")
+			else if (command.substr(0, 6) == "MKDIR " || command.substr(0, 6) == "mkdir ") // 2
 			{
 				if (commandSize > 6)
 				{
@@ -102,7 +101,15 @@ public:
 
 			else if (command.substr(0, 6) == "RMDIR " || command.substr(0, 6) == "rmdir ")
 			{
-				rmdir(command.substr(6, commandSize - 1));
+				if (commandSize > 6)
+				{
+					rmdir(command.substr(6, commandSize - 1));
+				}
+
+				else
+				{
+					cout << "Enter the name of a directory." << endl;
+				}
 			}
 
 			else if (command.substr(0, 3) == "VER" || command.substr(0, 3) == "ver")
@@ -124,13 +131,13 @@ public:
 			{
 				if (commandSize > 6)
 				{
-					create(command.substr(6, commandSize - 1));
+					create(command.substr(7, commandSize - 1));
 				}
 			}
 
 			else if (command.substr(0, 3) == "PWD" || command.substr(0, 3) == "pwd")
 			{
-				print();
+				cout << tree.currentFolder->name << endl;
 			}
 
 			else if (command.substr(0, 3) == "DEL" || command.substr(0, 3) == "del")
@@ -141,6 +148,46 @@ public:
 				}
 			}
 
+			else if (command.substr(0, 4) == "EDIT" || command.substr(0, 4) == "edit")
+			{
+				if (commandSize > 4)
+				{
+					edit(command.substr(5, commandSize - 1));
+				}
+			}
+
+			else if (command.substr(0, 4) == "FIND" || command.substr(0, 4) == "find")
+			{
+				if (commandSize > 4)
+				{
+					find(command.substr(4, commandSize - 1));
+				}
+			}
+
+			else if (command.substr(0, 4) == "HELP" || command.substr(0, 4) == "help")
+			{
+				if (commandSize > 4)
+				{
+					help(command.substr(4, commandSize - 1));
+				}
+			}
+
+			else if (command.substr(0, 7) == "CONVERT" || command.substr(0, 7) == "convert")
+			{
+				if (commandSize > 9)
+				{
+					convert(parse(command.substr(8, commandSize - 1), 1), parse(command.substr(8, commandSize - 1), 2));
+				}
+			}
+
+			else if (command.substr(0, 6) == "RENAME" || command.substr(0, 6) == "rename")
+			{
+				if (commandSize > 9)
+				{
+					renameFile(parse(command.substr(7, commandSize - 1), 1), parse(command.substr(7, commandSize - 1), 2));
+				}
+			}
+
 			else
 			{
 				cout << "There is no such command" << endl;
@@ -148,7 +195,7 @@ public:
 		}
 	}
 
-	void attrib(string filename) // Write code for attrib after create command
+	void attrib(string filename) 
 	{
 		File* curr = tree.currentFolder->searchAndReturnFile(filename);
 		if (curr != nullptr)
@@ -200,6 +247,40 @@ public:
 		{
 			tree.currentFolder->removeFile(filename);
 		}
+
+		else
+		{
+			cout << "There is no file with such a name." << endl;
+		}
+	}
+
+	void find(string filename)
+	{
+		File* file = tree.currentFolder->searchAndReturnFile(filename);
+		if (file != nullptr)
+		{
+			cout << file->retDate() << "\t" << file->retTime() << "\t" << file->name << file->extension << "\t" << file->currentState.size << endl;
+		}
+
+		else
+		{
+			cout << "No such file exists in current directory." << endl;
+		}
+	}
+
+	void edit(string filename)
+	{
+		File* file = tree.currentFolder->searchAndReturnFile(filename);
+		if (file != nullptr)
+		{
+			file->edit();
+			system("cls");
+		}
+
+		else
+		{
+			cout << "There is no file with such a name." << endl;
+		}
 	}
 
 	void rmdir(string name)
@@ -220,6 +301,24 @@ public:
 		if (name != "")
 		{
 			tree.currentFolder->createFiles(name);
+			string filenameWithoutExt;
+			int size = name.size();
+			for (int i = 0; i < size; i++)
+			{
+				if (name[i] != '.')
+				{
+					filenameWithoutExt += name[i];
+				}
+
+				else
+				{
+					break;
+				}
+			}
+			File* currFile = tree.currentFolder->searchAndReturnFile(filenameWithoutExt);
+			system("cls");
+			currFile->edit();
+			system("cls");
 		}
 
 		else
@@ -244,6 +343,26 @@ public:
 		}
 	}
 
+	void renameFile(string prev, string next)
+	{
+		File* curr = tree.currentFolder->searchAndReturnFile(prev);
+		File* isNextUsed = tree.currentFolder->searchAndReturnFile(next);
+		if (curr != nullptr && isNextUsed == nullptr)
+		{
+			curr->name = next;
+		}
+
+		else if (curr == nullptr)
+		{
+			cout << "There is no file with such a name." << endl;
+		}
+
+		else
+		{
+			cout << "The new name has already been used." << endl;
+		}
+	}
+
 	void cd(string foldername)
 	{
 		if (foldername != "")
@@ -263,7 +382,7 @@ public:
 
 		for (list<File*>::iterator it = curr->files.begin(); it != curr->files.end(); it++)
 		{
-			cout << (*it)->retDate() << "    " << (*it)->retTime() << "\t " << (*it)->currentState.size << "\t" << (*it)->name << endl;
+			cout << (*it)->retDate() << "    " << (*it)->retTime() << "\t " << (*it)->currentState.size << "\t" << (*it)->name << (*it)->extension << endl;
 		}
 	}
 
@@ -296,9 +415,222 @@ public:
 		}
 	}
 
-	void notepad(File* file)
+	void help(string command)
 	{
-		system("cls");
-		file->edit();
+		if (command == "ATTRIB" || command == "attrib")
+		{
+			cout << "Displays file (name provided as input) attributes" << endl;
+			cout << "Syntax: ATTRIB filename.extension" << endl;
+		}
+
+		else if (command == "CD" || command == "cd")
+		{
+			cout << "Changes the current directory to its subdirectory (name provided as input)" << endl;
+			cout << "Syntax: CD subdirectory" << endl;
+		}
+
+		else if (command == "CD." || command == "cd.")
+		{
+			cout << "Prints working directory (i.e. your current directory in your tree structure" << endl;
+			cout << "Syntax: CD." << endl;
+		}
+
+		else if (command == "CD.." || command == "cd..")
+		{
+			cout << "Change directory to previous directory" << endl;
+			cout << "Syntax: CD.." << endl;
+		}
+
+		else if (command == "CD\\" || command == "cd\\")
+		{
+			cout << "Changes directory to root directory (i.e. V:\\>)" << endl;
+			cout << "Syntax: CD\\" << endl;
+		}
+
+		else if (command == "CONVERT" || command == "convert")
+		{
+			cout << "Asks two types and converts extension of all files of one type to another type" << endl;
+			cout << "Syntax: CONVERT CURRENT.ext SUBSTITUTED.ext" << endl;
+		}
+
+		else if (command == "COPY" || command == "copy")
+		{
+			cout << "Copies one file in the current directory to another location (directory)" << endl;
+			cout << "Syntax: COPY SOURCE DESTINATION" << endl;
+		}
+
+		else if (command == "CREATE" || command == "create")
+		{
+			cout << "Creates a file with the name provided and allows the user to enter contents of the file." << endl;
+			cout << "Syntax: CREATE FILENAME" << endl;
+		}
+
+		else if (command == "DEL" || command == "del")
+		{
+			cout << "Delete a file whose name is provided in input." << endl;
+			cout << "Syntax: DEL FILENAME" << endl;
+		}
+
+		else if (command == "DIR" || command == "dir")
+		{
+			cout << "Displays a list of files and subdirectories in a directory." << endl;
+			cout << "Syntax: DIR" << endl;
+		}
+
+		else if (command == "EDIT" || command == "edit")
+		{
+			cout << "Opens a file and allows the user to edit and save the contents ofthe file." << endl;
+			cout << "Syntax: EDIT FILENAME" << endl;
+		}
+		
+		else if (command == "EXIT" || command == "exit")
+		{
+			cout << "Quits the program." << endl;
+			cout << "Syntax: EXIT" << endl;
+		}
+
+		else if (command == "FIND" || command == "find")
+		{
+			cout << "Searches for a file in your current virtual directory whose name is provided as input." << endl;
+			cout << "Syntax: FIND FILENAME" << endl;
+		}
+
+		else if (command == "FINDF" || command == "findf")
+		{
+			cout << "Searches for a text string in the currently open file or the file whose name is provided as input." << endl;
+			cout << "Syntax: FINDF string" << endl;
+		}
+
+		else if (command == "FINDSTR" || command == "findstr")
+		{
+			cout << "Searches for strings in all files of your current virtual directory, prints names of files with the string" << endl;
+			cout << "Syntax: FINDSTR FILENAME" << endl;
+		}
+
+		else if (command == "FORMAT" || command == "FORMAT")
+		{
+			cout << "Formats the current virtual directory i.e. empties the current directory and all its subdirectories" << endl;
+			cout << "Syntax: FORMAT" << endl;
+		}
+
+		else if (command == "LOADTREE" || command == "loadtree")
+		{
+			cout << "Load a given tree in your tree structure." << endl;
+			cout << "Syntax: loadtree FILENAME" << endl;
+		}
+
+		else if (command == "MKDIR" || command == "mkdir")
+		{
+			cout << "Creates a virtual directory." << endl;
+			cout << "Syntax: MKDIR FOLDERNAME" << endl;
+		}
+
+		else if (command == "MOVE" || command == "move")
+		{
+			cout << "Moves one file (whose name is provided as input) from one directory to another directory." << endl;
+			cout << "Syntax: MOVE SOURCE DESTINATION" << endl;
+		}
+
+		else if (command == "PPRINT" || command == "pprint")
+		{
+			cout << "Adds a text file to the priority based print queue, and displays the current priority queue. " << endl;
+			cout << "Syntax: PPRINT" << endl;
+		}
+
+		else if (command == "PROMPT" || command == "prompt")
+		{
+			cout << "Changes the Windows command prompt (for example from V:\> to V$)." << endl;
+			cout << "Syntax: PROMPT string" << endl;
+		}
+
+		else if (command == "PRINT" || command == "print")
+		{
+			cout << "Adds a text file to the print queue, and displays the current queue." << endl;
+			cout << "Syntax: PRINT FILENAME" << endl;
+		}
+
+		else if (command == "PQUEUE" || command == "pqueue")
+		{
+			cout << "Shows current state of the priority based print queue, with time left for each element" << endl;
+			cout << "Syntax: PQUEUE" << endl;
+		}
+
+		else if (command == "PWD" || command == "pwd")
+		{
+			cout << "Prints working directory." << endl;
+			cout << "Syntax: PWD" << endl;
+		}
+
+		else if (command == "QUEUE" || command == "queue")
+		{
+			cout << "Shows current state of the print queue, with time left for each element." << endl;
+			cout << "Syntax: QUEUE" << endl;
+		}
+
+		else if (command == "RENAME" || command == "rename")
+		{
+			cout << "Renames a file whose current and new name is provided as input." << endl;
+			cout << "Syntax: RENAME PREVIOUS NEXT" << endl;
+		}
+
+		else if (command == "RMDIR" || command == "rmdir")
+		{
+			cout << "Removes a directory along with its contents." << endl;
+			cout << "Syntax: RMDIR FOLDERNAME" << endl;
+		}
+
+		else if (command == "SAVE" || command == "save")
+		{
+			cout << "Saves the currently open file to disk." << endl;
+			cout << "Syntax: SAVE" << endl;
+		}
+
+		else if (command == "TREE" || command == "tree")
+		{
+			cout << "Displays the complete directory structure." << endl;
+			cout << "Syntax: TREE" << endl;
+		}
+
+		else if (command == "VER" || command == "ver")
+		{
+			cout << "Displays the version of your program." << endl;
+			cout << "Syntax: VER" << endl;
+		}
+
+		else
+		{
+			cout << "No such command exists in this version of DOS." << endl;
+		}
+	}
+	
+	string parse(string line, int idx)
+	{
+		int commaCount = 1;
+		string price;
+		int len = line.length();
+		for (int x = 0; x < len; x++)
+		{
+			if (line[x] == ' ')
+			{
+				commaCount++;
+			}
+			else if (commaCount == idx)
+			{
+				price = price + line[x];
+			}
+		}
+		idx = 0;
+		return price;
+	}
+
+	void convert(string prev, string next)
+	{
+		for (list<File*>::iterator it = tree.currentFolder->files.begin(); it != tree.currentFolder->files.end(); it++)
+		{
+			if ((*it)->extension == prev)
+			{
+				(*it)->extension = next;
+			}
+		}
 	}
 };
