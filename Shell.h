@@ -188,6 +188,30 @@ public:
 				}
 			}
 
+			else if (command.substr(0, 4) == "COPY" || command.substr(0, 4) == "copy") 
+			{
+				if (commandSize > 6)
+				{
+					command = command.substr(7, commandSize);
+					int index = command.find(' ');
+					string source = command.substr(0, index);
+					string destination = command.substr(source.length() + 3, commandSize);
+					copy(source, destination);
+				}
+			}
+
+			else if (command.substr(0, 4) == "MOVE" || command.substr(0, 4) == "move")
+			{
+				if (commandSize > 6)
+				{
+					command = command.substr(7, commandSize);
+					int index = command.find(' ');
+					string source = command.substr(0, index);
+					string destination = command.substr(source.length() + 3, commandSize);
+					move(source, destination);
+				}
+			}
+
 			else
 			{
 				cout << "There is no such command" << endl;
@@ -343,6 +367,56 @@ public:
 		}
 	}
 
+	void copy(string source, string destination)
+	{
+		File* fileToCopy = new File();
+		Folder* currentDir = tree.root;
+		string f;
+		while (source.length() > 0)
+		{
+			f = source.substr(0, source.find('\\'));
+			source = source.substr(f.length() + 1, source.length());
+			if (source.length() != 0)
+			{
+				currentDir = currentDir->searchAndReturnFolder(f);
+			}
+
+			if (currentDir == nullptr)
+			{
+				cout << "The path was not found." << endl;
+				return;
+			}
+		}
+		int size = f.size();
+		string temp;
+		for (int i = 0; i < size; i++)
+		{
+			if (f[i] == '.')
+			{
+				break;
+			}
+			temp += f[i];
+		}
+		f = temp;
+		fileToCopy = currentDir->searchAndReturnFile(f);
+
+		currentDir = tree.root;
+		
+		while (destination.length() > 0)
+		{
+			f = destination.substr(0, destination.find('\\'));
+			destination = destination.substr(f.length() + 1, destination.length());
+			currentDir = currentDir->searchAndReturnFolder(f);
+			if (currentDir == nullptr)
+			{
+				cout << "The path was not found." << endl;
+				return;
+			}
+		}
+			currentDir->files.push_back(fileToCopy);
+		
+	}
+
 	void renameFile(string prev, string next)
 	{
 		File* curr = tree.currentFolder->searchAndReturnFile(prev);
@@ -390,6 +464,56 @@ public:
 	{
 		DOSTree newTree;
 		tree = newTree;
+	}
+
+	void move(string source, string destination)
+	{
+		File* fileToMove = new File();
+		Folder* currentDir = tree.root;
+		string f;
+		while (source.length() > 0)
+		{
+			f = source.substr(0, source.find('\\'));
+			source = source.substr(f.length() + 1, source.length());
+			if (source.length() != 0)
+			{
+				currentDir = currentDir->searchAndReturnFolder(f);
+			}
+
+			if (currentDir == nullptr)
+			{
+				cout << "The path was not found." << endl;
+				return;
+			}
+		}
+		int size = f.size();
+		string temp;
+		for (int i = 0; i < size; i++)
+		{
+			if (f[i] == '.')
+			{
+				break;
+			}
+			temp += f[i];
+		}
+		f = temp;
+		fileToMove = currentDir->searchAndReturnFile(f);
+		currentDir->removeFile(f);
+		currentDir = tree.root;
+
+		while (destination.length() > 0)
+		{
+			f = destination.substr(0, destination.find('\\'));
+			destination = destination.substr(f.length() + 1, destination.length());
+			currentDir = currentDir->searchAndReturnFolder(f);
+			if (currentDir == nullptr)
+			{
+				cout << "The path was not found." << endl;
+				return;
+			}
+		}
+		currentDir->files.push_back(fileToMove);
+
 	}
 
 	void ver()
@@ -457,6 +581,8 @@ public:
 		{
 			cout << "Copies one file in the current directory to another location (directory)" << endl;
 			cout << "Syntax: COPY SOURCE DESTINATION" << endl;
+			cout << "SOURCE: V\\SUBDIRECTORIES\\FILENAME.EXT\\" << endl;
+			cout << "DESTINATION: V\\SUBDIRECTORIES\\" << endl;
 		}
 
 		else if (command == "CREATE" || command == "create")
@@ -529,6 +655,8 @@ public:
 		{
 			cout << "Moves one file (whose name is provided as input) from one directory to another directory." << endl;
 			cout << "Syntax: MOVE SOURCE DESTINATION" << endl;
+			cout << "SOURCE: V\\SUBDIRECTORIES\\FILENAME.EXT\\" << endl;
+			cout << "DESTINATION: V\\SUBDIRECTORIES\\" << endl;
 		}
 
 		else if (command == "PPRINT" || command == "pprint")
