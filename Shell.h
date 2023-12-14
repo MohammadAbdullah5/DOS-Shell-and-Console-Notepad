@@ -1,5 +1,6 @@
 #pragma once
 #include "Tree.h"
+#include <queue>
 using namespace std;
 
 class Shell
@@ -7,6 +8,8 @@ class Shell
 public:
 	DOSTree tree;
 	string promptI;
+	priority_queue<File*> printingPriorityQ;
+	queue<File*> printQ;
 	Shell()
 	{
 		promptI = ":\\>";
@@ -156,6 +159,27 @@ public:
 				}
 			}
 
+			else if (command.substr(0, 5) == "FINDF" || command.substr(0, 5) == "findf")
+			{
+				if (commandSize > 6)
+				{
+					command = command.substr(8, commandSize);
+					int index = command.find(' ');
+					string source = command.substr(0, index);
+					string input = command.substr(source.length() + 2, commandSize - 1);
+					findf(source, input);
+				}
+			}
+
+			else if (command.substr(0, 7) == "FINDSTR" || command.substr(0, 7) == "findstr")
+			{
+				if (commandSize > 8)
+				{
+					string input = command.substr(9, commandSize - 1);
+					findstr(input);
+				}
+			}
+
 			else if (command.substr(0, 4) == "FIND" || command.substr(0, 4) == "find")
 			{
 				if (commandSize > 4)
@@ -209,6 +233,38 @@ public:
 					string source = command.substr(0, index);
 					string destination = command.substr(source.length() + 3, commandSize);
 					move(source, destination);
+				}
+			}
+
+			else if (command.substr(0, 6) == "PPRINT" || command.substr(0, 6) == "pprint")
+			{
+				if (commandSize >= 7)
+				{
+					pprint(command.substr(7, commandSize));
+				}
+			}
+
+			else if (command.substr(0, 5) == "PRINT" || command.substr(0, 5) == "print")
+			{
+				if (commandSize >= 6)
+				{
+					print(command.substr(6, commandSize));
+				}
+			}
+
+			else if (command.substr(0, 6) == "PQUEUE" || command.substr(0, 6) == "pqueue")
+			{
+				if (commandSize == 6)
+				{
+					pqueue();
+				}
+			}
+
+			else if (command.substr(0, 5) == "QUEUE" || command.substr(0, 5) == "queue")
+			{
+				if (commandSize == 5)
+				{
+					queueb();
 				}
 			}
 
@@ -759,6 +815,153 @@ public:
 			{
 				(*it)->extension = next;
 			}
+		}
+	}
+
+	void findf(string source, string str)
+	{
+		File* file = new File();
+		Folder* currentDir = tree.root;
+		string f;
+		while (source.length() > 0)
+		{
+			f = source.substr(0, source.find('\\'));
+			source = source.substr(f.length() + 1, source.length());
+			if (source.length() != 0)
+			{
+				currentDir = currentDir->searchAndReturnFolder(f);
+			}
+
+			if (currentDir == nullptr)
+			{
+				cout << "The path was not found." << endl;
+				return;
+			}
+		}
+		int size = f.size();
+		string temp;
+		for (int i = 0; i < size; i++)
+		{
+			if (f[i] == '.')
+			{
+				break;
+			}
+			temp += f[i];
+		}
+		f = temp;
+		file = currentDir->searchAndReturnFile(f);
+		str = str.substr(0, str.find('\"'));
+
+		bool flag = file->ifStringExists(str);
+		if (flag)
+		{
+			cout << "This string exists in the file" << endl;
+		}
+
+		else
+		{
+			cout << "This string does not exists in the file" << endl;
+		}
+	}
+
+	void findstr(string input)
+	{
+		int i = 0;
+		input = input.substr(0, input.find('\"'));
+
+		for (list<File*>::iterator it = tree.currentFolder->files.begin(); it != tree.currentFolder->files.end(); it++)
+		{
+			if ((*it)->ifStringExists(input))
+			{
+				i++;
+				cout << "\t\t" << i << ".\t" << (*it)->name << (*it)->extension << endl;
+			}
+		}
+
+		if (i == 0)
+		{
+			cout << "\t\t\t The input string was not found in any file." << endl;
+		}
+
+		else
+		{
+			cout << "\t\t\t" << "The input string was found in " << i << " files." << endl;
+		}
+	}
+
+	void pprint(string filename)
+	{
+		if (filename != "")
+		{
+			int size = filename.size();
+			string temp;
+			for (int i = 0; i < size; i++)
+			{
+				if (filename[i] == '.')
+				{
+					break;
+				}
+				temp += filename[i];
+			}
+			filename = temp;
+			File* file = tree.currentFolder->searchAndReturnFile(filename);
+			printingPriorityQ.push(file);
+			cout << filename << " has been pushed to the printing priority queue." << endl;
+		}
+	}
+
+	void print(string filename)
+	{
+		if (filename != "")
+		{
+			int size = filename.size();
+			string temp;
+			for (int i = 0; i < size; i++)
+			{
+				if (filename[i] == '.')
+				{
+					break;
+				}
+				temp += filename[i];
+			}
+			filename = temp;
+			File* file = tree.currentFolder->searchAndReturnFile(filename);
+			printQ.push(file);
+			cout << filename << " has been pushed to the printing queue." << endl;
+		}
+	}
+
+	void queueb()
+	{
+		if (!printQ.empty())
+		{
+			queue<File*> pq = printQ;
+
+			int i = 0;
+			while (!pq.empty())
+			{
+				i++;
+				cout << "\t" << i << ". \t" << pq.front()->name << pq.front()->extension << endl;
+				pq.pop();
+			}
+			cout << i << " number of files are in the queue." << endl;
+		}
+	}
+
+	void pqueue()
+	{
+		if (!printingPriorityQ.empty())
+		{
+			priority_queue<File*> pq = printingPriorityQ;
+
+			int i = 0;
+			while (!pq.empty())
+			{
+				i++;
+				cout << "\t" << i << ". \t" << pq.top()->name << pq.top()->extension << endl;
+				pq.pop();
+			}
+			cout << i << " number of files are in the priority queue." << endl;
 		}
 	}
 };

@@ -70,6 +70,11 @@ public:
 		currentState.data.push_back(list<char>());
 	}
 
+	bool operator<(const File& other) const
+	{
+		return currentState.size > other.currentState.size;
+	}
+
 	void edit()
 	{
 		system("cls");
@@ -359,5 +364,18 @@ public:
 		return timed;
 	}
 
-	
+	bool ifStringExists(string input)
+	{
+		for (list<list<char>>::iterator it = currentState.data.begin(); it != currentState.data.end(); it++)
+		{
+			list<char>& rowt = *it;
+			string row(rowt.begin(), rowt.end());
+			if (row.find(input) != string::npos)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 };
