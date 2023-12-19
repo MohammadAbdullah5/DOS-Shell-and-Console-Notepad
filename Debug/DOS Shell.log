@@ -3,5 +3,5 @@ D:\University\Data Structures and Algorithms\DOS Shell\File.h(116,23): warning C
 D:\University\Data Structures and Algorithms\DOS Shell\File.h(139,23): warning C4018: '>=': signed/unsigned mismatch
 D:\University\Data Structures and Algorithms\DOS Shell\File.h(149,23): warning C4018: '<': signed/unsigned mismatch
 D:\University\Data Structures and Algorithms\DOS Shell\File.h(186,27): warning C4018: '<': signed/unsigned mismatch
-D:\University\Data Structures and Algorithms\DOS Shell\Shell.h(726,12): warning C4129: '>': unrecognized character escape sequence
+D:\University\Data Structures and Algorithms\DOS Shell\Shell.h(735,12): warning C4129: '>': unrecognized character escape sequence
   DOS Shell.vcxproj -> D:\University\Data Structures and Algorithms\DOS Shell\Debug\DOS Shell.exe

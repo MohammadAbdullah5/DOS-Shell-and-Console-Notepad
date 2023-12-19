@@ -2,24 +2,40 @@
 //
 
 #include <iostream>
+#include "Vim.h"
 #include "Shell.h"
 using namespace std;
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
-//Single rollno.cpp file submit krwani hy
+
+string printMenu()
+{
+    system("cls");
+    cout << "DOS Shell and Vim Notepad !" << endl;
+    cout << "1. DOS Shell" << endl;
+    cout << "2. Vim Notepad" << endl;
+    cout << "Your option....";
+    string option;
+    getline(cin, option);
+    return option;
+}
+
 int main()
 {
-    Shell shell;
-    shell.run();
+    string option;
+    while (option != "3")
+    {
+        option = printMenu();
+        if (option == "1")
+        {
+            Shell shell;
+            shell.run();
+        }
+
+        else if (option == "2")
+        {
+            VimNotepad vm;
+            vm.run();
+        }
+    }
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

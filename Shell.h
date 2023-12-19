@@ -504,16 +504,25 @@ public:
 
 	void dir()
 	{
+		int totalFilesSize = 0;
+		int filesCount = 0;
+		int foldersCount = 0;
 		Folder* curr = tree.currentFolder;
 		for (list<Folder*>::iterator it = curr->subDirectories.begin(); it != curr->subDirectories.end(); it++)
 		{
 			cout << (*it)->retDate() << "    " << (*it)->retTime() << "\t <DIR> \t" << (*it)->name << endl;
+			foldersCount++;
 		}
 
 		for (list<File*>::iterator it = curr->files.begin(); it != curr->files.end(); it++)
 		{
-			cout << (*it)->retDate() << "    " << (*it)->retTime() << "\t " << (*it)->currentState.size << "\t" << (*it)->name << (*it)->extension << endl;
+			cout << (*it)->retDate() << "    " << (*it)->retTime() << "\t " << (*it)->currentState.size << " bytes" << "\t" << (*it)->name << (*it)->extension << endl;
+			filesCount++;
+			totalFilesSize += (*it)->currentState.size;
 		}
+		cout << endl;
+		cout << "\t     \t\t " << totalFilesSize << "bytes" << endl;
+		cout << "\t    \t" << foldersCount << " sub-directories \t\t" << filesCount << " files" << endl;
 	}
 
 	void format()
